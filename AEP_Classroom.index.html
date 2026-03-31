@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEP Classroom</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0f1117;
+  --surface: #181c27;
+  --surface2: #1e2435;
+  --border: #2a3045;
+  --teal: #00c9a7;
+  --teal-dim: rgba(0,201,167,0.12);
+  --teal-glow: rgba(0,201,167,0.25);
+  --gold: #ffd166;
+  --coral: #ff6b6b;
+  --text: #e8eaf0;
+  --muted: #7a8299;
+  --success: #00c9a7;
+  --error: #ff6b6b;
+  --card: #1a1f30;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* ── ANIMATED BG ── */
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(0,201,167,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,201,167,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.orb1{width:500px;height:500px;background:radial-gradient(circle,rgba(0,201,167,0.08),transparent 70%);top:-100px;right:-100px}
+.orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(255,107,107,0.06),transparent 70%);bottom:-80px;left:-80px}
+
+/* ── SCREENS ── */
+.screen{display:none;min-height:100vh;position:relative;z-index:1}
+.screen.active{display:flex;flex-direction:column}
+
+/* ══════════════════════ LOGIN ══════════════════════ */
+#login-screen{align-items:center;justify-content:center}
+.login-wrap{width:100%;max-width:440px;padding:24px;animation:slideUp 0.5s cubic-bezier(.16,1,.3,1)}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+.login-brand{text-align:center;margin-bottom:40px}
+.brand-badge{display:inline-flex;align-items:center;gap:10px;background:var(--teal-dim);border:1px solid var(--teal-glow);border-radius:100px;padding:8px 20px;margin-bottom:20px}
+.brand-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(0.8)}}
+.brand-badge span{font-size:13px;font-weight:600;color:var(--teal);letter-spacing:0.5px}
+.login-brand h1{font-family:'DM Serif Display',serif;font-size:42px;line-height:1;color:var(--text);margin-bottom:8px}
+.login-brand h1 em{font-style:italic;color:var(--teal)}
+.login-brand p{font-size:14px;color:var(--muted)}
+
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:32px;backdrop-filter:blur(20px)}
+.role-switch{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:28px;gap:4px}
+.role-btn{flex:1;padding:10px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13.5px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted)}
+.role-btn.active{background:var(--teal);color:#000}
+
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11.5px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--muted);margin-bottom:7px}
+.field input,.field select{width:100%;padding:12px 16px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s,box-shadow .2s;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--teal);box-shadow:0 0 0 3px var(--teal-dim)}
+.field input::placeholder{color:var(--muted)}
+.field select option{background:var(--surface)}
+
+.enter-btn{width:100%;padding:14px;background:var(--teal);border:none;border-radius:12px;color:#000;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .2s;letter-spacing:0.3px;position:relative;overflow:hidden}
+.enter-btn::after{content:'';position:absolute;inset:0;background:white;opacity:0;transition:opacity .2s}
+.enter-btn:hover::after{opacity:0.08}
+.enter-btn:hover{transform:translateY(-1px);box-shadow:0 8px 24px var(--teal-glow)}
+.code-note{font-size:12px;color:var(--muted);text-align:center;margin-top:14px}
+.code-note strong{color:var(--teal)}
+
+/* ══════════════════════ TOPBAR ══════════════════════ */
+.topbar{height:60px;background:rgba(15,17,23,0.9);border-bottom:1px solid var(--border);backdrop-filter:blur(16px);display:flex;align-items:center;padding:0 28px;gap:16px;position:sticky;top:0;z-index:200;flex-shrink:0}
+.topbar-logo{font-family:'DM Serif Display',serif;font-size:20px;color:var(--teal)}
+.topbar-sep{width:1px;height:22px;background:var(--border)}
+.topbar-title{font-size:13.5px;font-weight:500;color:var(--muted)}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.user-chip{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:6px 14px}
+.user-chip .uc-name{font-size:13px;font-weight:600;color:var(--text)}
+.user-chip .uc-class{font-size:11.5px;color:var(--teal);font-weight:600}
+.topbar-btn{padding:7px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all .15s}
+.topbar-btn:hover{border-color:var(--coral);color:var(--coral)}
+
+/* ══════════════════════ STUDENT ══════════════════════ */
+.s-layout{display:flex;flex:1;min-height:0;overflow:hidden}
+.s-sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px;overflow-y:auto}
+.s-sidebar-label{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 12px;margin-bottom:4px}
+.s-nav-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;cursor:pointer;transition:all .15s;color:var(--muted);font-size:13.5px;font-weight:500;margin-bottom:3px;position:relative}
+.s-nav-item:hover{background:var(--surface2);color:var(--text)}
+.s-nav-item.active{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(0,201,167,0.2)}
+.s-nav-item .ni-icon{font-size:16px;flex-shrink:0}
+.s-nav-item .ni-done{width:7px;height:7px;border-radius:50%;background:var(--teal);position:absolute;right:12px;top:50%;transform:translateY(-50%)}
+
+.s-content{flex:1;overflow-y:auto;padding:32px 36px}
+.a-header{margin-bottom:28px}
+.a-header h2{font-family:'DM Serif Display',serif;font-size:30px;color:var(--text);margin-bottom:6px}
+.a-header p{font-size:14px;color:var(--muted)}
+
+/* Sections */
+.sec{margin-bottom:36px}
+.sec-title{font-size:11.5px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:var(--teal);padding-bottom:10px;border-bottom:1px solid var(--border);margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.sec-title .st-icon{font-size:17px}
+
+/* vocab */
+.vocab-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vocab-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
+.vocab-word{font-weight:600;font-size:13.5px;min-width:120px;color:var(--text)}
+.v-input{flex:1;background:transparent;border:none;border-bottom:1.5px solid var(--border);padding:4px 8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;outline:none;transition:border .2s}
+.v-input:focus{border-bottom-color:var(--teal)}
+.v-input.correct{border-bottom-color:var(--teal);color:var(--teal)}
+.v-input.incorrect{border-bottom-color:var(--coral);color:var(--coral)}
+
+/* fill blanks */
+.sentence-wrap{font-size:15px;line-height:2.5;margin-bottom:8px;color:var(--text)}
+.b-input{background:transparent;border:none;border-bottom:1.5px solid var(--teal);color:var(--teal);font-family:'DM Sans',sans-serif;font-size:15px;padding:2px 10px;min-width:100px;outline:none;transition:all .2s}
+.b-input:focus{border-bottom-color:var(--gold)}
+.b-input.correct{color:var(--success);border-bottom-color:var(--success)}
+.b-input.incorrect{color:var(--error);border-bottom-color:var(--error)}
+
+/* matching */
+.match-grid{display:grid;gap:8px}
+.match-row2{display:grid;grid-template-columns:1fr 1fr;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.match-term{padding:13px 18px;font-weight:600;font-size:14px;border-right:1px solid var(--border);display:flex;align-items:center}
+.match-sel{padding:8px 12px;display:flex;align-items:center}
+.match-sel select{width:100%;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border .2s}
+.match-sel select:focus{border-color:var(--teal)}
+.match-sel select.correct{border-color:var(--teal);color:var(--teal)}
+.match-sel select.incorrect{border-color:var(--coral);color:var(--coral)}
+
+/* mcq */
+.mcq-block{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px;margin-bottom:10px}
+.mcq-q{font-size:15px;font-weight:500;margin-bottom:14px;color:var(--text)}
+.mcq-opts{display:flex;flex-direction:column;gap:8px}
+.mcq-opt{display:flex;align-items:center;gap:12px;padding:11px 16px;border:1.5px solid var(--border);border-radius:9px;cursor:pointer;transition:all .15s;font-size:14px;color:var(--muted)}
+.mcq-opt:hover{border-color:var(--teal);color:var(--text);background:var(--teal-dim)}
+.mcq-opt input{accent-color:var(--teal);width:15px;height:15px;flex-shrink:0}
+.mcq-opt.correct{border-color:var(--teal);background:var(--teal-dim);color:var(--teal)}
+.mcq-opt.incorrect{border-color:var(--coral);background:rgba(255,107,107,0.1);color:var(--coral)}
+
+/* true/false */
+.tf-block{display:flex;justify-content:space-between;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 18px;margin-bottom:8px;gap:16px}
+.tf-stmt{font-size:14px;flex:1;color:var(--text)}
+.tf-btns{display:flex;gap:8px;flex-shrink:0}
+.tf-b{padding:7px 20px;border:1.5px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+.tf-b:hover{border-color:var(--teal);color:var(--teal)}
+.tf-b.sel-t{background:var(--teal);border-color:var(--teal);color:#000}
+.tf-b.sel-f{background:var(--coral);border-color:var(--coral);color:#fff}
+.tf-block.correct{border-color:var(--teal);background:var(--teal-dim)}
+.tf-block.incorrect{border-color:var(--coral);background:rgba(255,107,107,0.08)}
+
+/* categorize */
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cat-row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px}
+.cat-word{font-weight:600;font-size:14px;min-width:90px;color:var(--text)}
+.cat-sel{flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 10px;outline:none;transition:border .2s}
+.cat-sel:focus{border-color:var(--teal)}
+.cat-sel.correct{border-color:var(--teal);color:var(--teal)}
+.cat-sel.incorrect{border-color:var(--coral);color:var(--coral)}
+
+/* short answer */
+.short-block{margin-bottom:16px}
+.short-block p{font-size:15px;margin-bottom:9px;color:var(--text)}
+.short-block textarea{width:100%;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:13px 16px;resize:vertical;min-height:80px;outline:none;transition:border .2s}
+.short-block textarea:focus{border-color:var(--teal)}
+
+/* submit */
+.submit-area{padding:24px 0 8px;border-top:1px solid var(--border);display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:8px}
+.sub-btn{padding:13px 32px;background:var(--teal);border:none;border-radius:11px;color:#000;font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s}
+.sub-btn:hover{box-shadow:0 8px 24px var(--teal-glow);transform:translateY(-1px)}
+.sub-btn:disabled{background:var(--border);color:var(--muted);cursor:not-allowed;transform:none;box-shadow:none}
+.score-tag{padding:8px 18px;border-radius:100px;font-size:14px;font-weight:700}
+.score-tag.hi{background:rgba(0,201,167,0.15);color:var(--teal);border:1px solid rgba(0,201,167,0.3)}
+.score-tag.mid{background:rgba(255,209,102,0.15);color:var(--gold);border:1px solid rgba(255,209,102,0.3)}
+.score-tag.lo{background:rgba(255,107,107,0.15);color:var(--coral);border:1px solid rgba(255,107,107,0.3)}
+.sub-note{font-size:13px;color:var(--muted)}
+
+/* ══════════════════════ TEACHER DASH ══════════════════════ */
+.dash-wrap{display:flex;flex:1;min-height:0;overflow:hidden}
+.dash-sidebar{width:220px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:20px 12px}
+.ds-label{font-size:10.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 12px;margin-bottom:4px}
+.ds-item{display:flex;align-items:center;gap:10px;padding:11px 13px;border-radius:10px;cursor:pointer;transition:all .15s;color:var(--muted);font-size:13.5px;font-weight:500;margin-bottom:3px}
+.ds-item:hover{background:var(--surface2);color:var(--text)}
+.ds-item.active{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(0,201,167,0.2)}
+.ds-item .di-icon{font-size:16px}
+
+.dash-main{flex:1;overflow-y:auto;padding:32px 36px}
+.dash-main h2{font-family:'DM Serif Display',serif;font-size:28px;margin-bottom:22px;color:var(--text)}
+
+/* stats */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
+.stat-c{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px}
+.stat-c .sl{font-size:11.5px;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);font-weight:600;margin-bottom:10px}
+.stat-c .sv{font-family:'DM Serif Display',serif;font-size:38px;color:var(--text);line-height:1}
+.stat-c .ss{font-size:12px;color:var(--muted);margin-top:5px}
+.stat-c.hi .sv{color:var(--teal)}
+
+/* filter bar */
+.fbar{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap}
+.fbar label{font-size:13px;color:var(--muted);font-weight:500}
+.fbar select,.fbar input{background:var(--surface);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:9px 13px;outline:none;transition:border .2s}
+.fbar select:focus,.fbar input:focus{border-color:var(--teal)}
+.fbar select option{background:var(--surface)}
+.fbar-count{margin-left:auto;font-size:13px;color:var(--muted)}
+
+/* results table */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.rtable{width:100%;border-collapse:collapse}
+.rtable th{padding:12px 18px;text-align:left;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:var(--muted);background:var(--surface2);border-bottom:1px solid var(--border)}
+.rtable td{padding:12px 18px;font-size:14px;border-bottom:1px solid var(--border);color:var(--text)}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(255,255,255,0.02)}
+.spill{padding:5px 13px;border-radius:100px;font-size:12.5px;font-weight:700;display:inline-block}
+.spill.a{background:rgba(0,201,167,.15);color:var(--teal)}
+.spill.b{background:rgba(255,209,102,.15);color:var(--gold)}
+.spill.c{background:rgba(255,107,107,.15);color:var(--coral)}
+.spill.ns{background:var(--surface2);color:var(--muted)}
+.exp-btn{background:transparent;border:1px solid var(--border);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;color:var(--muted);font-family:'DM Sans',sans-serif;transition:all .15s}
+.exp-btn:hover{border-color:var(--teal);color:var(--teal)}
+.det-row{display:none}
+.det-row.open{display:table-row}
+.det-cell{padding:18px 22px;background:rgba(0,0,0,0.2);border-bottom:1px solid var(--border)}
+.det-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.det-item{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:10px 13px;font-size:13px}
+.det-item .dq{color:var(--muted);font-size:11px;margin-bottom:3px}
+.det-item .da{font-weight:500;color:var(--text)}
+.det-item.ok{border-color:rgba(0,201,167,0.4)}
+.det-item.bad{border-color:rgba(255,107,107,0.4)}
+.det-item.open-q{border-color:var(--border);border-style:dashed}
+.no-data{text-align:center;padding:56px;color:var(--muted);font-size:15px}
+.no-data .nd-icon{font-size:48px;display:block;margin-bottom:12px}
+
+/* assign overview cards */
+.aov-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+.aov-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;transition:border .2s;cursor:pointer}
+.aov-card:hover{border-color:var(--teal)}
+.aov-card h4{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px}
+.aov-card p{font-size:12px;color:var(--muted)}
+.aov-card .aov-num{font-family:'DM Serif Display',serif;font-size:34px;color:var(--teal);margin-top:10px}
+
+/* loading */
+.loading-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);animation:blink 1.2s infinite}
+.loading-dot:nth-child(2){animation-delay:.2s}
+.loading-dot:nth-child(3){animation-delay:.4s}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* toast */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:13px 22px;border-radius:12px;font-size:14px;font-weight:500;z-index:9999;opacity:0;transform:translateY(8px);transition:all .3s;pointer-events:none;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.ok{border-color:var(--teal);color:var(--teal)}
+.toast.err{border-color:var(--coral);color:var(--coral)}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .vocab-grid,.cat-grid{grid-template-columns:1fr}
+  .aov-grid{grid-template-columns:1fr}
+  .s-sidebar{display:none}
+}
+</style>
+</head>
+<body>
+<div class="bg-grid"></div>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="login-screen" class="screen active">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="brand-badge"><div class="brand-dot"></div><span>AEP CLASSROOM</span></div>
+      <h1>Academic<br><em>English</em> Portal</h1>
+      <p>Wycombe Abbey School · Intensive English Programme</p>
+    </div>
+    <div class="login-card">
+      <div class="role-switch">
+        <button class="role-btn active" onclick="setRole('student')">🎒 Student</button>
+        <button class="role-btn" onclick="setRole('teacher')">👩‍🏫 Teacher</button>
+      </div>
+      <div id="s-fields">
+        <div class="field"><label>Your Name</label><input id="sname" type="text" placeholder="e.g. Zhang Wei" /></div>
+        <div class="field"><label>Class</label>
+          <select id="sclass">
+            <option value="">Select your class</option>
+            <optgroup label="Year 7">
+              <option>7A</option><option>7B</option><option>7C</option><option>7D</option>
+            </optgroup>
+            <optgroup label="Year 8">
+              <option>8A</option><option>8B</option><option>8C</option><option>8D</option><option>8E</option><option>8F</option>
+            </optgroup>
+            <optgroup label="Year 9">
+              <option>9A</option><option>9B</option><option>9C</option><option>9D</option><option>9E</option><option>9F</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+      <div id="t-fields" style="display:none">
+        <div class="field"><label>Teacher Name</label><input id="tname" type="text" placeholder="e.g. Ms. Xie" /></div>
+        <div class="field"><label>Access Code</label><input id="tcode" type="password" placeholder="Teacher access code" /></div>
+      </div>
+      <button class="enter-btn" onclick="doLogin()">Enter Classroom →</button>
+      <p class="code-note" id="cnote" style="display:none">Teacher code: <strong>aep2025</strong></p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STUDENT ══════════ -->
+<div id="student-screen" class="screen">
+  <div class="topbar">
+    <span class="topbar-logo">AEP</span>
+    <div class="topbar-sep"></div>
+    <span class="topbar-title">Classroom</span>
+    <div class="topbar-right">
+      <div class="user-chip">
+        <span class="uc-name" id="u-name"></span>
+        <span class="uc-class" id="u-class"></span>
+      </div>
+      <button class="topbar-btn" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+  <div class="s-layout">
+    <nav class="s-sidebar" id="s-sidebar"></nav>
+    <div class="s-content" id="s-content"></div>
+  </div>
+</div>
+
+<!-- ══════════ TEACHER ══════════ -->
+<div id="teacher-screen" class="screen">
+  <div class="topbar">
+    <span class="topbar-logo">AEP</span>
+    <div class="topbar-sep"></div>
+    <span class="topbar-title">Teacher Dashboard</span>
+    <div class="topbar-right">
+      <div class="user-chip"><span class="uc-name" id="t-name"></span><span class="uc-class" style="color:var(--gold)">Teacher</span></div>
+      <button class="topbar-btn" onclick="logout()">Sign out</button>
+    </div>
+  </div>
+  <div class="dash-wrap">
+    <nav class="dash-sidebar">
+      <div class="ds-label">Dashboard</div>
+      <div class="ds-item active" id="dsi-overview" onclick="showDash('overview')"><span class="di-icon">📊</span> Overview</div>
+      <div class="ds-item" id="dsi-results" onclick="showDash('results')"><span class="di-icon">📋</span> Student Results</div>
+    </nav>
+    <div class="dash-main" id="dash-main"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════
+// SHARED STORAGE — uses window.storage API
+// (data shared across all users of this artifact)
+// ═══════════════════════════════════════
+const STORE_KEY = 'aep_submissions_v2';
+
+async function loadSubmissions() {
+  try {
+    const r = await window.storage.get(STORE_KEY, true);
+    return r ? JSON.parse(r.value) : [];
+  } catch(e) { return []; }
+}
+
+async function saveSubmission(sub) {
+  let subs = await loadSubmissions();
+  // remove any old submission from same student + assignment
+  subs = subs.filter(s => !(s.studentName===sub.studentName && s.studentClass===sub.studentClass && s.assignmentId===sub.assignmentId));
+  subs.push(sub);
+  try {
+    await window.storage.set(STORE_KEY, JSON.stringify(subs), true);
+  } catch(e) { showToast('Save error — try again','err'); }
+}
+
+// ═══════════════════════════════════════
+// ASSIGNMENTS
+// ═══════════════════════════════════════
+const ASSIGNMENTS = [
+  {
+    id: 'rust',
+    title: '7D – Rust & Oxidation',
+    emoji: '🔩',
+    subtitle: 'Vocabulary · Fill in Blanks · Matching',
+    sections: [
+      { type:'vocab_chinese', title:'Write the Chinese Meaning', emoji:'📝',
+        items:[
+          {word:'oxygen',answer:'氧气'},{word:'oxidation',answer:'氧化'},
+          {word:'react',answer:'反应'},{word:'reaction',answer:'反应'},
+          {word:'electricity',answer:'电'},{word:'chemistry',answer:'化学'},
+          {word:'chemical',answer:'化学的'},{word:'biochemistry',answer:'生物化学'},
+          {word:'compound',answer:'化合物'},{word:'compress',answer:'压缩'},
+          {word:'coworker',answer:'同事'},{word:'coaction',answer:'合作'},
+          {word:'rust',answer:'铁锈'}
+        ]
+      },
+      { type:'fill_blanks', title:'Fill in the Blanks', emoji:'✏️',
+        items:[
+          {sentence:'Water is a _____ made of hydrogen and _____.', blanks:['compound','oxygen'], key:['compound','oxygen']},
+          {sentence:'The _____ between vinegar and baking soda produces bubbles.', blanks:['reaction'], key:['reaction']},
+          {sentence:'_____ helps power our lights and computers.', blanks:['Electricity'], key:['electricity']},
+          {sentence:'_____ is the science that studies substances and how they change.', blanks:['Chemistry'], key:['chemistry']},
+          {sentence:'When you _____ air, it takes up less space.', blanks:['compress'], key:['compress']},
+          {sentence:'My _____ helped me finish the science project on time.', blanks:['coworker'], key:['coworker']},
+        ]
+      },
+      { type:'matching', title:'Match the Word with Its Meaning', emoji:'🔗',
+        pairs:[
+          {term:'oxidation', def:'The process when a substance combines with oxygen', answer:'d'},
+          {term:'react', def:'Respond or change when mixed with something', answer:'c'},
+          {term:'rust', def:'To combine with oxygen and form rust', answer:'b'},
+          {term:'coaction', def:'Work together toward a common goal', answer:'a'},
+          {term:'biochemistry', def:'The study of chemical processes in living things', answer:'e'},
+          {term:'chemical', def:'Related to substances and their reactions', answer:'f'},
+        ],
+        options:[
+          {val:'a',label:'a. Work together toward a common goal'},
+          {val:'b',label:'b. To combine with oxygen and form rust'},
+          {val:'c',label:'c. Respond or change when mixed with something'},
+          {val:'d',label:'d. The process when a substance combines with oxygen'},
+          {val:'e',label:'e. The study of chemical processes in living things'},
+          {val:'f',label:'f. Related to substances and their reactions'},
+        ]
+      }
+    ]
+  },
+  {
+    id: 'drugs',
+    title: 'Recreational & Medicinal Drugs',
+    emoji: '💊',
+    subtitle: 'Vocab Match · Fill Blanks · MCQ · True/False · Short Answer',
+    sections: [
+      { type:'matching', title:'Match Word with Chinese Meaning', emoji:'🔗',
+        pairs:[
+          {term:'drug', def:'药物', answer:'c'},
+          {term:'deadly', def:'致命的', answer:'e'},
+          {term:'harmful', def:'有害的', answer:'d'},
+          {term:'medicinal drug', def:'药用药物', answer:'b'},
+          {term:'recreational drug', def:'娱乐性药物', answer:'a'},
+        ],
+        options:[
+          {val:'a',label:'A. 娱乐性药物'},{val:'b',label:'B. 药用药物'},
+          {val:'c',label:'C. 药物'},{val:'d',label:'D. 有害的'},{val:'e',label:'E. 致命的'},
+        ]
+      },
+      { type:'fill_blanks', title:'Fill in the Blanks', emoji:'✏️',
+        items:[
+          {sentence:'Drugs are _____ that can change how the body works.', blanks:['chemical substances'], key:['chemical substances']},
+          {sentence:'Some drugs can be very _____ if taken in large amounts.', blanks:['harmful'], key:['harmful']},
+          {sentence:'A _____ drug is used in medicine to treat illness.', blanks:['medicinal'], key:['medicinal']},
+          {sentence:'_____ drugs are often taken for fun or relaxation.', blanks:['Recreational'], key:['recreational']},
+          {sentence:'_____ are given by doctors to treat infections.', blanks:['Antibiotics'], key:['antibiotics']},
+          {sentence:'Taking drugs only for _____ can lead to serious problems.', blanks:['enjoyment'], key:['enjoyment']},
+        ]
+      },
+      { type:'mcq', title:'Multiple Choice', emoji:'🔘',
+        questions:[
+          {q:'What is a drug?', options:['A kind of food that gives energy','A chemical substance that affects how the body works','A sport activity people do for fun','A medical place like a hospital'], answer:1},
+          {q:'Which drug is mainly used to help people treat illness?', options:['Recreational drug','Deadly drug','Medicinal drug','Illegal drug'], answer:2},
+          {q:'Why do doctors use antibiotics?', options:['To help people relax','To treat infections','To help people stay awake','To increase enjoyment'], answer:1},
+          {q:'Which usually has no health benefit and may be harmful?', options:['Antibiotics','Medication','Medicinal drug','Recreational drug'], answer:3},
+        ]
+      },
+      { type:'true_false', title:'True or False', emoji:'✅',
+        items:[
+          {statement:'Medicinal drugs are usually taken to help improve a person\'s health or treat illness.', answer:true},
+          {statement:'Recreational drugs are always safe because people take them to relax or have fun.', answer:false},
+          {statement:'Some drugs can be harmful or even deadly if not used correctly.', answer:true},
+          {statement:'Antibiotics are often used by doctors to treat infections in the body.', answer:true},
+          {statement:'All drugs are good for the body as long as people enjoy using them.', answer:false},
+        ]
+      },
+      { type:'short_answer', title:'Short Answer Questions', emoji:'✍️',
+        questions:[
+          'Why can even medicinal drugs be dangerous if people do not take them correctly?',
+          'What is one difference between a medicinal drug and a recreational drug?',
+          'Why should people be careful when taking drugs for enjoyment?'
+        ]
+      }
+    ]
+  },
+  {
+    id: 'solar',
+    title: 'Universe & Solar System',
+    emoji: '🪐',
+    subtitle: 'Fill Blanks · MCQ · True/False · Categorize · Short Answer',
+    sections: [
+      { type:'fill_blanks', title:'Fill in the Blanks', emoji:'✏️',
+        items:[
+          {sentence:'The _____ is our home galaxy.', blanks:['Milky Way'], key:['milky way']},
+          {sentence:'Saturn\'s _____ are made of ice and dust.', blanks:['rings'], key:['rings']},
+          {sentence:'Our solar system orbits the center of the _____.', blanks:['Milky Way'], key:['milky way']},
+          {sentence:'Scientists think dark matter makes up _____ percent of the universe.', blanks:['80'], key:['80']},
+        ]
+      },
+      { type:'mcq', title:'Multiple Choice', emoji:'🔘',
+        questions:[
+          {q:'What is the Milky Way?', options:['A rocky planet','A galaxy','A moon'], answer:1},
+          {q:'What do scientists believe about dark matter?', options:['It is brighter than stars','It is heavier than water','It is invisible and pulls space objects'], answer:2},
+          {q:'How many planets are in our solar system?', options:['8','12','4'], answer:0},
+          {q:'What is at the center of the solar system?', options:['Earth','Jupiter','The sun'], answer:2},
+          {q:'Which planet is the coldest?', options:['Neptune','Uranus','Saturn'], answer:1},
+        ]
+      },
+      { type:'true_false', title:'True or False', emoji:'✅',
+        items:[
+          {statement:'The Milky Way has more than 200 billion stars.', answer:false},
+          {statement:'Earth is at the center of the universe.', answer:false},
+          {statement:'The Andromeda galaxy will collide with the Milky Way.', answer:true},
+          {statement:'The sun orbits around Jupiter.', answer:false},
+          {statement:'Gas giants are the smallest planets.', answer:false},
+          {statement:'Jupiter is a rocky planet.', answer:false},
+          {statement:'Mercury is the smallest planet.', answer:true},
+          {statement:'Saturn has over 60 moons.', answer:true},
+        ]
+      },
+      { type:'categorize', title:'Categorize the Planets', emoji:'🪐',
+        items:['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'],
+        categories:['Rocky Planets','Gas Giants','Ice Giants'],
+        answers:{'Mercury':'Rocky Planets','Venus':'Rocky Planets','Earth':'Rocky Planets','Mars':'Rocky Planets','Jupiter':'Gas Giants','Saturn':'Gas Giants','Uranus':'Ice Giants','Neptune':'Ice Giants'}
+      },
+      { type:'short_answer', title:'Short Answer Questions', emoji:'✍️',
+        questions:[
+          'Why is dark matter important even though we can\'t see it?',
+          'Where is our solar system located in the Milky Way?',
+          'What makes Kepler-16b different from the eight planets in our solar system?'
+        ]
+      }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════
+// AUTH
+// ═══════════════════════════════════════
+let currentUser = null;
+let currentRole = 'student';
+let currentAid = ASSIGNMENTS[0].id;
+
+function setRole(r) {
+  currentRole = r;
+  document.querySelectorAll('.role-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&r==='student')||(i===1&&r==='teacher')));
+  document.getElementById('s-fields').style.display = r==='student'?'':'none';
+  document.getElementById('t-fields').style.display = r==='teacher'?'':'none';
+  document.getElementById('cnote').style.display = r==='teacher'?'':'none';
+}
+
+async function doLogin() {
+  if (currentRole==='student') {
+    const name = document.getElementById('sname').value.trim();
+    const cls = document.getElementById('sclass').value;
+    if (!name) return showToast('Please enter your name','err');
+    if (!cls) return showToast('Please select your class','err');
+    currentUser = {name, class:cls, role:'student'};
+    document.getElementById('u-name').textContent = name;
+    document.getElementById('u-class').textContent = cls;
+    showScreen('student-screen');
+    await renderStudentUI();
+  } else {
+    const name = document.getElementById('tname').value.trim();
+    const code = document.getElementById('tcode').value;
+    if (!name) return showToast('Please enter your name','err');
+    if (code !== 'aep2025') return showToast('Incorrect access code','err');
+    currentUser = {name, role:'teacher'};
+    document.getElementById('t-name').textContent = name;
+    showScreen('teacher-screen');
+    showDash('overview');
+  }
+}
+
+function logout() {
+  currentUser = null;
+  ['sname','tname','tcode'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('sclass').value='';
+  showScreen('login-screen');
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+// ═══════════════════════════════════════
+// STUDENT UI
+// ═══════════════════════════════════════
+async function renderStudentUI() {
+  const subs = await loadSubmissions();
+  const mySubs = subs.filter(s=>s.studentName===currentUser.name && s.studentClass===currentUser.class);
+
+  // sidebar
+  const sidebar = document.getElementById('s-sidebar');
+  sidebar.innerHTML = `<div class="s-sidebar-label">Assignments</div>` +
+    ASSIGNMENTS.map(a => {
+      const done = mySubs.find(s=>s.assignmentId===a.id);
+      return `<div class="s-nav-item${a.id===currentAid?' active':''}" onclick="switchAssignment('${a.id}')">
+        <span class="ni-icon">${a.emoji}</span>
+        <span style="flex:1">${a.title}</span>
+        ${done?'<span class="ni-done"></span>':''}
+      </div>`;
+    }).join('');
+
+  // content
+  const a = ASSIGNMENTS.find(x=>x.id===currentAid);
+  const existing = mySubs.find(s=>s.assignmentId===currentAid);
+  renderAssignment(a, existing);
+}
+
+async function switchAssignment(id) {
+  currentAid = id;
+  await renderStudentUI();
+}
+
+function renderAssignment(a, existing) {
+  const submitted = !!existing;
+  let html = `<div class="a-header"><h2>${a.emoji} ${a.title}</h2><p>${a.subtitle}</p></div>`;
+
+  a.sections.forEach((sec,si) => {
+    html += `<div class="sec"><div class="sec-title"><span class="st-icon">${sec.emoji}</span>${sec.title}</div>`;
+
+    if (sec.type==='vocab_chinese') {
+      html += `<div class="vocab-grid">`;
+      sec.items.forEach((item,ii) => {
+        const key=`v_${si}_${ii}`, val=existing?(existing.answers[key]||''):'';
+        const cls=submitted?(norm(val)===norm(item.answer)?'correct':'incorrect'):'';
+        html += `<div class="vocab-row"><span class="vocab-word">${item.word}</span>
+          <input class="v-input ${cls}" data-key="${key}" type="text" placeholder="中文..." value="${esc(val)}" ${submitted?'readonly':''}></div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (sec.type==='fill_blanks') {
+      sec.items.forEach((item,ii) => {
+        let s = item.sentence;
+        item.blanks.forEach((_,bi) => {
+          const key=`f_${si}_${ii}_${bi}`, val=existing?(existing.answers[key]||''):'';
+          const cls=submitted?(norm(val)===norm(item.key[bi])?'correct':'incorrect'):'';
+          s=s.replace('_____',`<input class="b-input ${cls}" data-key="${key}" type="text" value="${esc(val)}" ${submitted?'readonly':''}>`);
+        });
+        html+=`<div class="sentence-wrap">${s}</div>`;
+      });
+    }
+
+    if (sec.type==='matching') {
+      html+=`<div class="match-grid">`;
+      sec.pairs.forEach((p,pi) => {
+        const key=`m_${si}_${pi}`, val=existing?(existing.answers[key]||''):'';
+        const cls=submitted?(val===p.answer?'correct':'incorrect'):'';
+        const opts=sec.options.map(o=>`<option value="${o.val}" ${val===o.val?'selected':''}>${o.label}</option>`).join('');
+        html+=`<div class="match-row2">
+          <div class="match-term">${p.term}</div>
+          <div class="match-sel"><select class="${cls}" data-key="${key}" ${submitted?'disabled':''}>
+            <option value="">Choose...</option>${opts}</select></div>
+        </div>`;
+      });
+      html+=`</div>`;
+    }
+
+    if (sec.type==='mcq') {
+      sec.questions.forEach((q,qi) => {
+        const key=`q_${si}_${qi}`, val=existing?existing.answers[key]:undefined;
+        html+=`<div class="mcq-block"><div class="mcq-q">${qi+1}. ${q.q}</div><div class="mcq-opts">`;
+        q.options.forEach((opt,oi) => {
+          const chk=val==oi?'checked':'';
+          const cls=submitted?(oi===q.answer?'correct':(val==oi&&oi!==q.answer?'incorrect':'')):'';
+          html+=`<label class="mcq-opt ${cls}"><input type="radio" name="${key}" value="${oi}" ${chk} ${submitted?'disabled':''}> ${opt}</label>`;
+        });
+        html+=`</div></div>`;
+      });
+    }
+
+    if (sec.type==='true_false') {
+      sec.items.forEach((item,ii) => {
+        const key=`t_${si}_${ii}`, val=existing?existing.answers[key]:undefined;
+        const cls=submitted?(val===String(item.answer)?'correct':'incorrect'):'';
+        const tC=(val==='true')?'sel-t':'', fC=(val==='false')?'sel-f':'';
+        html+=`<div class="tf-block ${cls}">
+          <span class="tf-stmt">${item.statement}</span>
+          <div class="tf-btns">
+            <button class="tf-b ${tC}" data-key="${key}" data-val="true" onclick="pickTF(this)" ${submitted?'disabled':''}>True</button>
+            <button class="tf-b ${fC}" data-key="${key}" data-val="false" onclick="pickTF(this)" ${submitted?'disabled':''}>False</button>
+          </div></div>`;
+      });
+    }
+
+    if (sec.type==='categorize') {
+      html+=`<div class="cat-grid">`;
+      sec.items.forEach((item,ii) => {
+        const key=`c_${si}_${ii}`, val=existing?(existing.answers[key]||''):'';
+        const cls=submitted?(val===sec.answers[item]?'correct':'incorrect'):'';
+        const opts=sec.categories.map(c=>`<option value="${c}" ${val===c?'selected':''}>${c}</option>`).join('');
+        html+=`<div class="cat-row"><span class="cat-word">${item}</span>
+          <select class="cat-sel ${cls}" data-key="${key}" ${submitted?'disabled':''}>
+            <option value="">Category...</option>${opts}</select></div>`;
+      });
+      html+=`</div>`;
+    }
+
+    if (sec.type==='short_answer') {
+      sec.questions.forEach((q,qi) => {
+        const key=`s_${si}_${qi}`, val=existing?(existing.answers[key]||''):'';
+        html+=`<div class="short-block"><p>${qi+1}. ${q}</p>
+          <textarea data-key="${key}" placeholder="Write your answer here..." ${submitted?'readonly':''}>${esc(val)}</textarea></div>`;
+      });
+    }
+
+    html+=`</div>`;
+  });
+
+  if (submitted) {
+    const pct=Math.round(existing.score*100);
+    const grade=pct>=85?'hi':pct>=65?'mid':'lo';
+    html+=`<div class="submit-area">
+      <span class="score-tag ${grade}">${pct}% Score</span>
+      <span class="sub-note">Submitted ${existing.submittedAt}. Short answers reviewed by teacher.</span>
+    </div>`;
+  } else {
+    html+=`<div class="submit-area"><button class="sub-btn" onclick="submitWork()">Submit Assignment →</button></div>`;
+  }
+
+  document.getElementById('s-content').innerHTML = html;
+}
+
+function pickTF(btn) {
+  const key=btn.dataset.key;
+  document.querySelectorAll(`[data-key="${key}"]`).forEach(b=>{b.classList.remove('sel-t','sel-f')});
+  btn.classList.add(btn.dataset.val==='true'?'sel-t':'sel-f');
+}
+
+function collectAnswers() {
+  const ans={};
+  document.querySelectorAll('[data-key]').forEach(el => {
+    if (el.type==='radio') { if(el.checked) ans[el.dataset.key]=el.value; }
+    else if (el.tagName==='BUTTON' && (el.classList.contains('sel-t')||el.classList.contains('sel-f'))) { ans[el.dataset.key]=el.dataset.val; }
+    else if (el.tagName!=='BUTTON') ans[el.dataset.key]=el.value;
+  });
+  return ans;
+}
+
+function scoreAll(a, answers) {
+  let tot=0, ok=0;
+  a.sections.forEach((sec,si) => {
+    if (sec.type==='vocab_chinese') sec.items.forEach((item,ii)=>{tot++;if(norm(answers[`v_${si}_${ii}`])===norm(item.answer))ok++;});
+    if (sec.type==='fill_blanks') sec.items.forEach((item,ii)=>item.key.forEach((k,bi)=>{tot++;if(norm(answers[`f_${si}_${ii}_${bi}`])===norm(k))ok++;}));
+    if (sec.type==='matching') sec.pairs.forEach((p,pi)=>{tot++;if(answers[`m_${si}_${pi}`]===p.answer)ok++;});
+    if (sec.type==='mcq') sec.questions.forEach((q,qi)=>{tot++;if(Number(answers[`q_${si}_${qi}`])===q.answer)ok++;});
+    if (sec.type==='true_false') sec.items.forEach((item,ii)=>{tot++;if(answers[`t_${si}_${ii}`]===String(item.answer))ok++;});
+    if (sec.type==='categorize') sec.items.forEach((item,ii)=>{tot++;if(answers[`c_${si}_${ii}`]===sec.answers[item])ok++;});
+  });
+  return tot>0?ok/tot:0;
+}
+
+async function submitWork() {
+  const a = ASSIGNMENTS.find(x=>x.id===currentAid);
+  const answers = collectAnswers();
+  const score = scoreAll(a, answers);
+  const sub = {
+    id: Date.now(),
+    studentName: currentUser.name,
+    studentClass: currentUser.class,
+    assignmentId: a.id,
+    assignmentTitle: a.title,
+    answers, score,
+    submittedAt: new Date().toLocaleString('en-GB')
+  };
+  document.querySelector('.sub-btn').disabled = true;
+  document.querySelector('.sub-btn').textContent = 'Saving...';
+  await saveSubmission(sub);
+  showToast(`✓ Submitted! Score: ${Math.round(score*100)}%`, 'ok');
+  await renderStudentUI();
+}
+
+// ═══════════════════════════════════════
+// TEACHER DASHBOARD
+// ═══════════════════════════════════════
+let currentDash = 'overview';
+
+async function showDash(tab) {
+  currentDash = tab;
+  document.querySelectorAll('.ds-item').forEach(i=>i.classList.remove('active'));
+  document.getElementById('dsi-'+tab).classList.add('active');
+  const subs = await loadSubmissions();
+  if (tab==='overview') renderOverview(subs);
+  else renderResults(subs);
+}
+
+function renderOverview(subs) {
+  const total=subs.length;
+  const students=[...new Set(subs.map(s=>s.studentName+'|'+s.studentClass))].length;
+  const avg=total?Math.round(subs.reduce((a,s)=>a+s.score,0)/total*100):0;
+  const aCards=ASSIGNMENTS.map(a=>{
+    const ss=subs.filter(s=>s.assignmentId===a.id);
+    const aavg=ss.length?Math.round(ss.reduce((x,s)=>x+s.score,0)/ss.length*100):0;
+    return `<div class="aov-card" onclick="showDash('results')">
+      <h4>${a.emoji} ${a.title}</h4><p>${a.subtitle}</p>
+      <div class="aov-num">${ss.length}</div>
+      <p style="font-size:13px;color:var(--muted);margin-top:4px">submissions · avg <strong style="color:var(--teal)">${aavg}%</strong></p>
+    </div>`;
+  }).join('');
+
+  document.getElementById('dash-main').innerHTML = `
+    <h2>Overview</h2>
+    <div class="stats-row">
+      <div class="stat-c hi"><div class="sl">Submissions</div><div class="sv">${total}</div><div class="ss">Total received</div></div>
+      <div class="stat-c"><div class="sl">Students</div><div class="sv">${students}</div><div class="ss">Unique</div></div>
+      <div class="stat-c"><div class="sl">Avg Score</div><div class="sv">${avg}%</div><div class="ss">All assignments</div></div>
+      <div class="stat-c"><div class="sl">Assignments</div><div class="sv">${ASSIGNMENTS.length}</div><div class="ss">Active</div></div>
+    </div>
+    <h2 style="font-size:22px;margin-bottom:16px">By Assignment</h2>
+    <div class="aov-grid">${aCards}</div>
+    <button class="sub-btn" onclick="showDash('results')">View All Student Results →</button>`;
+}
+
+function renderResults(subs, fc='', fa='', fn='') {
+  const classes=[...new Set(subs.map(s=>s.studentClass))].sort();
+  let filtered=subs.filter(s=>
+    (!fc||s.studentClass===fc)&&(!fa||s.assignmentId===fa)&&
+    (!fn||s.studentName.toLowerCase().includes(fn.toLowerCase()))
+  ).sort((a,b)=>new Date(b.id)-new Date(a.id));
+
+  const cSel=`<select onchange="renderResults(allSubs,'${fa}','${fn}');" id="fc">
+    <option value="">All Classes</option>
+    ${classes.map(c=>`<option ${fc===c?'selected':''} value="${c}">${c}</option>`).join('')}
+  </select>`;
+  // workaround: use IDs to read filter values
+  const aSel=`<select id="fa">
+    <option value="">All Assignments</option>
+    ${ASSIGNMENTS.map(a=>`<option value="${a.id}" ${fa===a.id?'selected':''}>${a.title}</option>`).join('')}
+  </select>`;
+  const nInp=`<input id="fn" type="text" placeholder="Search name..." value="${fn}" style="width:180px">`;
+  const applyBtn=`<button onclick="applyFilter()" style="padding:9px 16px;background:var(--teal);border:none;border-radius:9px;color:#000;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;cursor:pointer">Filter</button>`;
+
+  let rows='';
+  if (!filtered.length) {
+    rows=`<tr><td colspan="6" class="no-data"><span class="nd-icon">📭</span>No submissions yet</td></tr>`;
+  } else {
+    filtered.forEach(sub=>{
+      const pct=Math.round(sub.score*100);
+      const g=pct>=85?'a':pct>=70?'b':'c';
+      rows+=`<tr>
+        <td><strong>${sub.studentName}</strong></td>
+        <td>${sub.studentClass}</td>
+        <td>${sub.assignmentTitle}</td>
+        <td><span class="spill ${g}">${pct}%</span></td>
+        <td>${sub.submittedAt}</td>
+        <td><button class="exp-btn" onclick="toggleDet(${sub.id})">Details ▾</button></td>
+      </tr>
+      <tr class="det-row" id="det-${sub.id}">
+        <td class="det-cell" colspan="6">${buildDetailHTML(sub)}</td>
+      </tr>`;
+    });
+  }
+
+  document.getElementById('dash-main').innerHTML = `
+    <h2>Student Results</h2>
+    <div class="fbar"><label>Filter:</label>${cSel}${aSel}${nInp}${applyBtn}
+      <span class="fbar-count">${filtered.length} result${filtered.length!==1?'s':''}</span></div>
+    <div class="table-wrap">
+      <table class="rtable">
+        <thead><tr><th>Student</th><th>Class</th><th>Assignment</th><th>Score</th><th>Submitted</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+
+  // store for filter
+  window.allSubs = subs;
+}
+
+function applyFilter() {
+  const fc=document.getElementById('fc')?.value||'';
+  const fa=document.getElementById('fa')?.value||'';
+  const fn=document.getElementById('fn')?.value||'';
+  renderResults(window.allSubs||[], fc, fa, fn);
+}
+
+function buildDetailHTML(sub) {
+  const a=ASSIGNMENTS.find(x=>x.id===sub.assignmentId);
+  if (!a) return '';
+  let items=[];
+  a.sections.forEach((sec,si)=>{
+    if (sec.type==='vocab_chinese') sec.items.forEach((item,ii)=>{
+      const k=`v_${si}_${ii}`, v=sub.answers[k]||'(blank)';
+      items.push({q:item.word,a:v,exp:item.answer,ok:norm(v)===norm(item.answer)});
+    });
+    if (sec.type==='fill_blanks') sec.items.forEach((item,ii)=>item.key.forEach((k,bi)=>{
+      const key=`f_${si}_${ii}_${bi}`, v=sub.answers[key]||'(blank)';
+      items.push({q:item.sentence.substring(0,40)+'...',a:v,exp:k,ok:norm(v)===norm(k)});
+    }));
+    if (sec.type==='matching') sec.pairs.forEach((p,pi)=>{
+      const v=sub.answers[`m_${si}_${pi}`];
+      items.push({q:p.term,a:v||'(none)',exp:p.answer,ok:v===p.answer});
+    });
+    if (sec.type==='mcq') sec.questions.forEach((q,qi)=>{
+      const v=sub.answers[`q_${si}_${qi}`];
+      items.push({q:q.q.substring(0,45)+'...',a:v!=null?q.options[v]:'(none)',exp:q.options[q.answer],ok:Number(v)===q.answer});
+    });
+    if (sec.type==='true_false') sec.items.forEach((item,ii)=>{
+      const v=sub.answers[`t_${si}_${ii}`];
+      items.push({q:item.statement.substring(0,50)+'...',a:v||'(none)',exp:String(item.answer),ok:v===String(item.answer)});
+    });
+    if (sec.type==='categorize') sec.items.forEach((item,ii)=>{
+      const v=sub.answers[`c_${si}_${ii}`];
+      items.push({q:item,a:v||'(none)',exp:sec.answers[item],ok:v===sec.answers[item]});
+    });
+    if (sec.type==='short_answer') sec.questions.forEach((q,qi)=>{
+      const v=sub.answers[`s_${si}_${qi}`]||'(no answer)';
+      items.push({q:q.substring(0,50)+'...',a:v,exp:'Open-ended',ok:null});
+    });
+  });
+  return `<div class="det-grid">${items.map(item=>`
+    <div class="det-item ${item.ok===true?'ok':item.ok===false?'bad':'open-q'}">
+      <div class="dq">${item.q}</div>
+      <div class="da">${item.a}${item.ok===false?` <span style="color:var(--muted);font-size:11px">→ ${item.exp}</span>`:''}</div>
+    </div>`).join('')}</div>`;
+}
+
+function toggleDet(id) {
+  const r=document.getElementById('det-'+id);
+  if (r) r.classList.toggle('open');
+}
+
+// ═══════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════
+function norm(s){return (s||'').toLowerCase().trim().replace(/[.,!?]/g,'')}
+function esc(s){return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+function showToast(msg,type='') {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show '+(type||'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&document.getElementById('login-screen').classList.contains('active'))doLogin();
+});
+</script>
+</body>
+</html>
