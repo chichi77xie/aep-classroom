@@ -205,7 +205,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     <div class="login-brand">
       <div class="brand-badge"><div class="brand-dot"></div><span>AEP CLASSROOM</span></div>
       <h1>Academic<br><em>English</em> Portal</h1>
-      <p>Wycombe Abbey School · Intensive English Programme</p>
+      <p>Academic English Programme | Ms Chichi</p>
     </div>
     <div class="login-card">
       <div class="role-switch">
@@ -228,7 +228,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="field"><label>Access Code</label><input id="tcode" type="password" placeholder="Teacher access code"/></div>
       </div>
       <button class="enter-btn" onclick="doLogin()">Enter Classroom →</button>
-      <p class="code-note" id="cnote" style="display:none">Teacher code: <strong>aep2025</strong></p>
+      <p class="code-note" id="cnote" style="display:none"></p>
     </div>
   </div>
 </div>
@@ -281,6 +281,52 @@ async function apiGet(){
 }
 
 const ASSIGNMENTS=[
+  {id:'drugs7d',title:'7D – Medicinal & Recreational Drugs',emoji:'💊',subtitle:'Multiple Choice · Vocab Match · Fill Blanks · True/False',sections:[
+    {type:'mcq',title:'Vocabulary Multiple Choice',emoji:'📝',questions:[
+      {q:'1. deadly',options:['A. 有趣的','B. 致命的','C. 轻微的'],answer:1},
+      {q:'2. chemical substance(s)',options:['A. 化学物质','B. 食物成分','C. 天然材料'],answer:0},
+      {q:'3. harmful',options:['A. 有帮助的','B. 无害的','C. 有害的'],answer:2},
+      {q:'4. medicine',options:['A. 药物','B. 食物','C. 能量'],answer:0},
+      {q:'5. medicinal',options:['A. 娱乐的','B. 药用的','C. 危险的'],answer:1},
+      {q:'6. recreation',options:['A. 工作','B. 娱乐活动','C. 学习'],answer:1},
+      {q:'7. recreational',options:['A. 娱乐的','B. 医疗的','C. 必须的'],answer:0},
+      {q:'8. medicinal drug',options:['A. 娱乐性药物','B. 医用药物','C. 非法药物'],answer:1},
+      {q:'9. recreational drug',options:['A. 医用药物','B. 娱乐性药物','C. 营养补充剂'],answer:1},
+      {q:'10. addiction',options:['A. 选择','B. 上瘾','C. 健康'],answer:1},
+      {q:'11. antibiotics',options:['A. 维生素','B. 抗生素','C. 药膏'],answer:1},
+      {q:'12. treat infections',options:['A. 预防感染','B. 治疗感染','C. 传播感染'],answer:1},
+      {q:'13. enjoyment',options:['A. 痛苦','B. 快乐','C. 压力'],answer:1},
+      {q:'14. legal',options:['A. 合法的','B. 非法的','C. 危险的'],answer:0},
+      {q:'15. illegal',options:['A. 合法的','B. 非法的','C. 医疗的'],answer:1},
+      {q:'16. treat',options:['A. 忽视','B. 治疗','C. 伤害'],answer:1},
+    ]},
+    {type:'matching',title:'Part 1 — Match the Word with Its Meaning',emoji:'🔗',
+      pairs:[
+        {term:'drug',answer:'c'},{term:'deadly',answer:'e'},{term:'harmful',answer:'d'},
+        {term:'medicinal drug',answer:'b'},{term:'recreational drug',answer:'a'}
+      ],
+      options:[
+        {val:'a',label:'A. 娱乐性药物'},{val:'b',label:'B. 药用药物'},
+        {val:'c',label:'C. 药物'},{val:'d',label:'D. 有害的'},{val:'e',label:'E. 致命的'}
+      ]
+    },
+    {type:'fill_blanks',title:'Part 2 — Fill in the Blanks',emoji:'✏️',items:[
+      {sentence:'Drugs are _____ that can change how the body works and affect the chemical reaction in our body and how a person feels after taking them.',blanks:['chemical substances'],key:['chemical substances']},
+      {sentence:'Some drugs can be very _____ to our body if people take lots of them or use them in the wrong way.',blanks:['harmful'],key:['harmful']},
+      {sentence:'_____ drugs are often taken by people for fun or relaxation, even though they may cause health problems.',blanks:['Recreational'],key:['recreational']},
+    ]},
+    {type:'mcq',title:'Part 3 — Multiple Choice',emoji:'🔘',questions:[
+      {q:'What is a drug?',options:['A kind of food that gives energy','A chemical substance that affects how the body works','A sport activity people do for fun','A medical place like a hospital'],answer:1},
+      {q:'Which of the following drugs is mainly used to help people treat illness?',options:['Recreational drug','Deadly drug','Medicinal drug','Illegal drug'],answer:2},
+      {q:'Which of the following usually has no health benefit and may be harmful to the body?',options:['Antibiotics','Medication','Medicinal drug','Recreational drug'],answer:3},
+    ]},
+    {type:'true_false',title:'Part 4 — True or False',emoji:'✅',items:[
+      {statement:"Medicinal drugs are usually taken to help improve a person's health or treat illness.",answer:true},
+      {statement:'Recreational drugs are always safe because people take them to relax or have fun.',answer:false},
+      {statement:'Some drugs can be harmful or even deadly if they are not used in the right way.',answer:true},
+      {statement:'All drugs are good for the body as long as people enjoy using them.',answer:false},
+    ]},
+  ]},
   {id:'rust',title:'7D – Rust & Oxidation',emoji:'🔩',subtitle:'Vocabulary · Fill in Blanks · Matching',sections:[
     {type:'vocab_chinese',title:'Write the Chinese Meaning',emoji:'📝',items:[
       {word:'oxygen',answer:'氧气'},{word:'oxidation',answer:'氧化'},{word:'react',answer:'反应'},
