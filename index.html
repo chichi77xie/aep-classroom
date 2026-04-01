@@ -191,6 +191,26 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .toast.show{opacity:1;transform:translateY(0)}
 .toast.ok{border-color:var(--teal);color:var(--teal)}
 .toast.err{border-color:var(--coral);color:var(--coral)}
+
+/* Vocab flip cards */
+.vocab-chapter-wrap{padding:8px 0}
+.vocab-theme-title{font-size:15px;font-weight:700;margin-bottom:14px;color:var(--teal)}
+.vcard-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:28px}
+.vcard{height:120px;perspective:600px;cursor:pointer}
+.vcard-inner{position:relative;width:100%;height:100%;transition:transform .45s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.vcard.flipped .vcard-inner{transform:rotateY(180deg)}
+.vcard-front,.vcard-back{position:absolute;inset:0;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;backface-visibility:hidden;padding:10px}
+.vcard-front{background:var(--surface);border:1.5px solid var(--border)}
+.vcard-front .vw{font-size:16px;font-weight:700;text-align:center;line-height:1.3}
+.vcard-front .tap{font-size:10.5px;color:var(--muted);margin-top:8px}
+.vcard-back{background:var(--teal-dim);border:1.5px solid rgba(0,201,167,0.4);transform:rotateY(180deg);gap:3px}
+.vcard-back .vb-pron{font-size:11px;color:var(--teal);text-align:center}
+.vcard-back .vb-pos{font-size:10px;color:var(--muted);font-style:italic}
+.vcard-back .vb-zh{font-size:15px;font-weight:700;text-align:center;line-height:1.3}
+.vcard-back .vb-en{font-size:11px;color:var(--muted);text-align:center;line-height:1.3}
+
+.add-sec-btn{padding:8px 16px;background:var(--surface2);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.add-sec-btn:hover{border-color:var(--teal);color:var(--teal)}
 @media(max-width:900px){.stats-row{grid-template-columns:1fr 1fr}.vocab-grid,.cat-grid{grid-template-columns:1fr}.aov-grid{grid-template-columns:1fr}.s-sidebar{width:180px}}
 </style>
 </head>
@@ -262,6 +282,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
       <div class="ds-label">Dashboard</div>
       <div class="ds-item active" id="dsi-overview" onclick="showDash('overview')"><span class="di-icon">📊</span> Overview</div>
       <div class="ds-item" id="dsi-results" onclick="showDash('results')"><span class="di-icon">📋</span> Student Results</div>
+      <div class="ds-item" id="dsi-manage" onclick="showDash('manage')"><span class="di-icon">📚</span> Manage Assignments</div>
+      <div class="ds-item" id="dsi-add" onclick="showDash('add')"><span class="di-icon">➕</span> Add Assignment</div>
     </nav>
     <div class="dash-main" id="dash-main"></div>
   </div>
@@ -357,37 +379,61 @@ const ASSIGNMENTS=[
       ]
     }
   ]},
-  {id:'drugs',title:'Recreational & Medicinal Drugs',emoji:'💊',subtitle:'Vocab Match · Fill Blanks · MCQ · True/False · Short Answer',sections:[
-    {type:'matching',title:'Match Word with Chinese Meaning',emoji:'🔗',
-      pairs:[{term:'drug',answer:'c'},{term:'deadly',answer:'e'},{term:'harmful',answer:'d'},{term:'medicinal drug',answer:'b'},{term:'recreational drug',answer:'a'}],
-      options:[{val:'a',label:'A. 娱乐性药物'},{val:'b',label:'B. 药用药物'},{val:'c',label:'C. 药物'},{val:'d',label:'D. 有害的'},{val:'e',label:'E. 致命的'}]
-    },
-    {type:'fill_blanks',title:'Fill in the Blanks',emoji:'✏️',items:[
-      {sentence:'Drugs are _____ that can change how the body works.',blanks:['chemical substances'],key:['chemical substances']},
-      {sentence:'Some drugs can be very _____ if taken in large amounts.',blanks:['harmful'],key:['harmful']},
-      {sentence:'A _____ drug is used in medicine to treat illness.',blanks:['medicinal'],key:['medicinal']},
-      {sentence:'_____ drugs are often taken for fun or relaxation.',blanks:['Recreational'],key:['recreational']},
-      {sentence:'_____ are given by doctors to treat infections.',blanks:['Antibiotics'],key:['antibiotics']},
-      {sentence:'Taking drugs only for _____ can lead to serious problems.',blanks:['enjoyment'],key:['enjoyment']},
+  {id:'g8-vaccines-antibiotics',title:'G8 – Turning Points in Biology',emoji:'🧬',subtitle:'Vocab Cards · Antibiotics MCQ · Vaccine MCQ · Worksheet',sections:[
+    {type:'vocab_review',title:'Vocabulary Review',emoji:'🃏',chapterId:'g8-turning-points'},
+    {type:'mcq',title:'Antibiotics – Vocab Quiz',emoji:'💊',questions:[
+      {q:'1. antibiotics',options:['A. 细菌感染','B. 抗生素','C. MRSA（耐甲氧西林金黄色葡萄球菌）','D. 突变'],answer:1},
+      {q:'2. bacterial infections',options:['A. 抗生素','B. 突变','C. 细菌感染','D. 细菌'],answer:2},
+      {q:'3. viral infections',options:['A. 病毒感染','B. 抗生素','C. 超级细菌','D. 治疗'],answer:0},
+      {q:'4. penicillin',options:['A. 青霉素','B. 病毒','C. 复制','D. 细菌'],answer:0},
+      {q:'5. antibiotic resistance',options:['A. 病毒','B. 存活','C. 抗生素','D. 耐药性'],answer:3},
+      {q:'6. mutation',options:['A. MRSA（耐甲氧西林金黄色葡萄球菌）','B. 突变','C. 病毒感染','D. 存活'],answer:1},
+      {q:'7. superbug',options:['A. 超级细菌','B. 病毒','C. 细菌','D. 耐药性'],answer:0},
+      {q:'8. MRSA',options:['A. 复制','B. 病毒感染','C. 存活','D. MRSA（耐甲氧西林金黄色葡萄球菌）'],answer:3},
+      {q:'9. bacteria',options:['A. 细菌','B. 病毒感染','C. 细菌感染','D. 治疗'],answer:0},
+      {q:'10. virus',options:['A. 病毒感染','B. 病毒','C. 耐药性','D. MRSA（耐甲氧西林金黄色葡萄球菌）'],answer:1},
+      {q:'11. treat',options:['A. 治疗','B. 超级细菌','C. 细菌','D. 突变'],answer:0},
+      {q:'12. reproduce',options:['A. 耐药性','B. 复制','C. 超级细菌','D. 突变'],answer:1},
+      {q:'13. survive',options:['A. 细菌','B. 存活','C. 抗生素','D. 耐药性'],answer:1},
     ]},
-    {type:'mcq',title:'Multiple Choice',emoji:'🔘',questions:[
-      {q:'What is a drug?',options:['A kind of food that gives energy','A chemical substance that affects how the body works','A sport activity','A medical place like a hospital'],answer:1},
-      {q:'Which drug is mainly used to treat illness?',options:['Recreational drug','Deadly drug','Medicinal drug','Illegal drug'],answer:2},
-      {q:'Why do doctors use antibiotics?',options:['To help people relax','To treat infections','To help people stay awake','To increase enjoyment'],answer:1},
-      {q:'Which usually has no health benefit and may be harmful?',options:['Antibiotics','Medication','Medicinal drug','Recreational drug'],answer:3},
+    {type:'mcq',title:'Vaccines – Vocab Quiz',emoji:'💉',questions:[
+      {q:'1. microorganism',options:['A. 疫苗','B. 免疫系统','C. 进入人体','D. 微生物'],answer:3},
+      {q:'2. antibody',options:['A. 白细胞','B. 免疫力','C. 进入人体','D. 抗体'],answer:3},
+      {q:'3. immune system',options:['A. 免疫系统','B. 疫苗接种','C. 更快产生','D. 免疫力'],answer:0},
+      {q:'4. white blood cell',options:['A. 疫苗','B. 说出','C. 微生物','D. 白细胞'],answer:3},
+      {q:'5. immunity',options:['A. 进入人体','B. 说出','C. 免疫力','D. 解释'],answer:2},
+      {q:'6. vaccine',options:['A. 有害微生物','B. 产生抗体','C. 描述','D. 疫苗'],answer:3},
+      {q:'7. vaccination',options:['A. 进入人体','B. 白细胞','C. 描述','D. 疫苗接种'],answer:3},
+      {q:'8. state',options:['A. 说出','B. 免疫力','C. 进入人体','D. 解释'],answer:0},
+      {q:'9. describe',options:['A. 免疫系统','B. 描述','C. 消灭它','D. 疫苗接种'],answer:1},
+      {q:'10. explain',options:['A. 微生物','B. 产生抗体','C. 解释','D. 描述'],answer:2},
+      {q:'11. harmful microorganism',options:['A. 描述','B. 疫苗','C. 有害微生物','D. 免疫系统'],answer:2},
+      {q:'12. enters the body',options:['A. 进入人体','B. 免疫力','C. 描述','D. 产生抗体'],answer:0},
+      {q:'13. produce antibodies',options:['A. 白细胞','B. 消灭它','C. 产生抗体','D. 免疫系统'],answer:2},
+      {q:'14. destroy it',options:['A. 消灭它','B. 产生抗体','C. 描述','D. 更快产生'],answer:0},
+      {q:'15. produced faster',options:['A. 描述','B. 产生抗体','C. 更快产生','D. 进入人体'],answer:2},
+      {q:'16. dead or inactive microorganisms',options:['A. 解释','B. 抗体','C. 疫苗接种','D. 灭活微生物'],answer:3},
+      {q:'17. stimulate the immune system',options:['A. 刺激免疫系统','B. 白细胞','C. 解释','D. 有害微生物'],answer:0},
     ]},
-    {type:'true_false',title:'True or False',emoji:'✅',items:[
-      {statement:"Medicinal drugs are usually taken to help improve a person's health.",answer:true},
-      {statement:'Recreational drugs are always safe because people take them to relax.',answer:false},
-      {statement:'Some drugs can be harmful or even deadly if not used correctly.',answer:true},
-      {statement:'Antibiotics are often used to treat infections in the body.',answer:true},
-      {statement:'All drugs are good as long as people enjoy using them.',answer:false},
+    {type:'fill_blanks',title:'Part 1 — How Your Body Fights Disease',emoji:'🛡️',wordBank:['microorganism','white blood cell','antibody','immunity'],items:[
+      {sentence:'A _____ enters the body → the body detects it.',blanks:['microorganism'],key:['microorganism']},
+      {sentence:'_____ make antibodies to fight the invader.',blanks:['white blood cell'],key:['white blood cells']},
+      {sentence:'The body makes an _____ to destroy the microorganism.',blanks:['antibody'],key:['antibody']},
+      {sentence:'The body has _____ — it remembers how to fight the same germ!',blanks:['immunity'],key:['immunity']},
     ]},
-    {type:'short_answer',title:'Short Answer Questions',emoji:'✍️',questions:[
-      "Why can even medicinal drugs be dangerous if not taken correctly?",
-      "What is one difference between a medicinal drug and a recreational drug?",
-      "Why should people be careful when taking drugs for enjoyment?"
-    ]}
+    {type:'fill_blanks',title:'Part 2 — How Vaccines Work',emoji:'💉',wordBank:['dead','weakened','immune','antibodies','immunity'],items:[
+      {sentence:'A vaccine contains _____ or _____ microorganisms.',blanks:['dead','weakened'],key:['dead','weakened']},
+      {sentence:'It tricks the _____ system into making _____.',blanks:['immune','antibodies'],key:['immune','antibodies']},
+      {sentence:'This gives the body _____ without getting sick.',blanks:['immunity'],key:['immunity']},
+    ]},
+    {type:'mcq',title:'Knowledge Check — Vaccines & Antibiotics',emoji:'✅',questions:[
+      {q:'What type of cell makes antibodies?',options:['Red blood cells','White blood cells','Platelets','Stem cells'],answer:1},
+      {q:'What does a vaccine contain?',options:['Live and strong germs','Dead or inactive germs','Sugar water','Antibiotics'],answer:1},
+      {q:'Who discovered the first vaccine?',options:['Louis Pasteur','Alexander Fleming','Edward Jenner','Marie Curie'],answer:2},
+      {q:'Which disease did the first vaccine prevent?',options:['Measles','Flu','Smallpox','Cholera'],answer:2},
+      {q:'What is antibiotic resistance?',options:['When antibiotics become stronger','When bacteria are not killed by antibiotics','When viruses become bacteria','When the immune system is too strong'],answer:1},
+      {q:'Can antibiotics treat viral infections?',options:['Yes, always','Only sometimes','No, never','Only with a doctor'],answer:2},
+    ]},
   ]},
   {id:'solar',title:'Universe & Solar System',emoji:'🪐',subtitle:'Fill Blanks · MCQ · True/False · Categorize · Short Answer',sections:[
     {type:'fill_blanks',title:'Fill in the Blanks',emoji:'✏️',items:[
@@ -425,6 +471,56 @@ const ASSIGNMENTS=[
     ]}
   ]}
 ];
+
+
+/* ── CHAPTER VOCAB ── */
+const VOCAB_CHAPTERS = {
+  'g8-turning-points': {
+    title: 'G8 – Turning Points in Biology',
+    themes: [
+      {
+        name: '🧪 Theme 1: Antibiotics 抗生素',
+        words: [
+          {word:'antibiotics', pos:'noun', zh:'抗生素', pronunciation:'/ˌæntɪbaɪˈɒtɪks/', en:'medicines that kill bacteria'},
+          {word:'bacterial', pos:'adjective', zh:'细菌的', pronunciation:'/bækˈtɪəriəl/', en:'related to bacteria'},
+          {word:'bacteria', pos:'noun', zh:'细菌', pronunciation:'/bækˈtɪəriə/', en:'tiny living organisms'},
+          {word:'viral infection', pos:'noun phrase', zh:'病毒感染', pronunciation:'/ˈvaɪrəl ɪnˈfekʃən/', en:'illness caused by a virus'},
+          {word:'infection', pos:'noun', zh:'感染', pronunciation:'/ɪnˈfekʃən/', en:'when germs enter the body'},
+          {word:'mutation', pos:'noun', zh:'突变', pronunciation:'/mjuːˈteɪʃən/', en:'a change in genes'},
+          {word:'antibiotic resistance', pos:'noun phrase', zh:'抗生素耐药性', pronunciation:'/ˌæntɪbaɪˈɒtɪk rɪˈzɪstəns/', en:'when bacteria are not killed by antibiotics'},
+          {word:'superbug', pos:'noun', zh:'超级细菌', pronunciation:'/ˈsuːpəbʌɡ/', en:'bacteria that resist antibiotics'},
+          {word:'MRSA', pos:'noun', zh:'耐甲氧西林金黄色葡萄球菌', pronunciation:'/ˌemɑːrˌesˈeɪ/', en:'a dangerous resistant bacteria'},
+          {word:'penicillin', pos:'noun', zh:'青霉素', pronunciation:'/ˌpenɪˈsɪlɪn/', en:'a type of antibiotic'},
+          {word:'treat', pos:'verb', zh:'治疗', pronunciation:'/triːt/', en:'to make someone better'},
+          {word:'reproduce', pos:'verb', zh:'繁殖 / 复制', pronunciation:'/ˌriːprəˈdjuːs/', en:'to make more of itself'},
+          {word:'survive', pos:'verb', zh:'存活', pronunciation:'/səˈvaɪv/', en:'to stay alive'},
+        ]
+      },
+      {
+        name: '💉 Theme 2: Vaccines & Immunity 疫苗 & 免疫系统',
+        words: [
+          {word:'microorganism', pos:'noun', zh:'微生物', pronunciation:'/ˌmaɪkrəʊˈɔːɡənɪzəm/', en:'very small living things'},
+          {word:'harmful microorganism', pos:'noun phrase', zh:'有害微生物', pronunciation:'/ˈhɑːmfəl ˌmaɪkrəʊˈɔːɡənɪzəm/', en:'microbes that cause disease'},
+          {word:'immune system', pos:'noun phrase', zh:'免疫系统', pronunciation:'/ɪˈmjuːn ˈsɪstəm/', en:'body system that fights disease'},
+          {word:'immunity', pos:'noun', zh:'免疫力', pronunciation:'/ɪˈmjuːnɪti/', en:'ability to fight infection'},
+          {word:'white blood cell', pos:'noun phrase', zh:'白细胞', pronunciation:'/waɪt blʌd sel/', en:'cells that fight germs'},
+          {word:'antibody', pos:'noun', zh:'抗体', pronunciation:'/ˈæntɪbɒdi/', en:'proteins that fight infection'},
+          {word:'vaccine', pos:'noun', zh:'疫苗', pronunciation:'/ˈvæksiːn/', en:'medicine that protects from disease'},
+          {word:'vaccination', pos:'noun', zh:'疫苗接种', pronunciation:'/ˌvæksɪˈneɪʃən/', en:'the act of getting a vaccine'},
+          {word:'produce antibodies', pos:'verb phrase', zh:'产生抗体', pronunciation:'/prəˈdjuːs ˈæntɪbɒdiz/', en:'to make antibodies'},
+          {word:'produced faster', pos:'verb phrase', zh:'更快产生', pronunciation:'/prəˈdjuːst ˈfɑːstə/', en:'made more quickly'},
+          {word:'destroy', pos:'verb', zh:'消灭', pronunciation:'/dɪˈstrɔɪ/', en:'to kill germs'},
+          {word:'enters the body', pos:'verb phrase', zh:'进入人体', pronunciation:'/ˈentəz ðə ˈbɒdi/', en:'goes into the body'},
+          {word:'dead or inactive microorganisms', pos:'noun phrase', zh:'灭活微生物', pronunciation:'/ded ɔː ɪnˈæktɪv ˌmaɪkrəʊˈɔːɡənɪzəmz/', en:'weakened or dead microbes in vaccines'},
+          {word:'stimulate the immune system', pos:'verb phrase', zh:'刺激免疫系统', pronunciation:'/ˈstɪmjʊleɪt ðə ɪˈmjuːn ˈsɪstəm/', en:'activate body defenses'},
+          {word:'state', pos:'verb', zh:'说出', pronunciation:'/steɪt/', en:'to say clearly'},
+          {word:'describe', pos:'verb', zh:'描述', pronunciation:'/dɪˈskraɪb/', en:'to give details'},
+          {word:'explain', pos:'verb', zh:'解释', pronunciation:'/ɪkˈspleɪn/', en:'to make something clear'},
+        ]
+      }
+    ]
+  }
+};
 
 let currentUser=null,currentRole='student',currentAid=ASSIGNMENTS[0].id,mySubmissions=[];
 
@@ -514,7 +610,8 @@ function renderAssignment(a,existing){
         item.blanks.forEach((_,bi)=>{
           const key=`f_${si}_${ii}_${bi}`,val=saved[key]||'';
           const cls=submitted?(norm(val)===norm(item.key[bi])?'correct':'incorrect'):'';
-          s=s.replace('_____',`<input class="b-input ${cls}" data-key="${key}" type="text" value="${esc(val)}" ${submitted?'readonly':''}>`);
+          const fbWrong=submitted&&norm(val)!==norm(item.key[bi]);
+          s=s.replace('_____',`<input class="b-input ${cls}" data-key="${key}" type="text" value="${esc(val)}" ${submitted?'readonly':''}>${fbWrong?`<span style="font-size:12px;color:var(--teal);margin-left:4px;">✓ ${item.key[bi]}</span>`:''}`);
         });
         html+=`<div class="sentence-wrap">${s}</div>`;
       });
@@ -525,20 +622,26 @@ function renderAssignment(a,existing){
         const key=`m_${si}_${pi}`,val=saved[key]||'';
         const cls=submitted?(val===p.answer?'correct':'incorrect'):'';
         const opts=sec.options.map(o=>`<option value="${o.val}" ${val===o.val?'selected':''}>${o.label}</option>`).join('');
+        const matchWrong=submitted&&val!==p.answer;
+        const correctLabel=matchWrong?sec.options.find(o=>o.val===p.answer)?.label:'';
         html+=`<div class="match-row2"><div class="match-term">${p.term}</div>
-          <div class="match-sel"><select class="${cls}" data-key="${key}" ${submitted?'disabled':''}><option value="">Choose...</option>${opts}</select></div></div>`;
+          <div class="match-sel"><select class="${cls}" data-key="${key}" ${submitted?'disabled':''}><option value="">Choose...</option>${opts}</select>
+          ${matchWrong?`<span style="font-size:12px;color:var(--teal);margin-left:6px;">✓ ${correctLabel}</span>`:''}
+          </div></div>`;
       });
       html+=`</div>`;
     }
     if(sec.type==='mcq'){
       sec.questions.forEach((q,qi)=>{
         const key=`q_${si}_${qi}`,val=saved[key];
+        const mcqWrong=submitted&&val!=null&&Number(val)!==q.answer;
         html+=`<div class="mcq-block"><div class="mcq-q">${/^\d+[\.\)]/.test(q.q)?'':qi+1+'. '}${q.q}</div><div class="mcq-opts">`;
         q.options.forEach((opt,oi)=>{
           const chk=val==oi?'checked':'';
           const cls=submitted?(oi===q.answer?'correct':(val==oi&&oi!==q.answer?'incorrect':'')):'';
           html+=`<label class="mcq-opt ${cls}"><input type="radio" name="${key}" value="${oi}" ${chk} ${submitted?'disabled':''}> ${opt}</label>`;
         });
+        if(mcqWrong)html+=`<div style="margin-top:8px;font-size:12.5px;color:var(--teal);">✓ 正确答案：${q.options[q.answer]}</div>`;
         html+=`</div></div>`;
       });
     }
@@ -547,11 +650,13 @@ function renderAssignment(a,existing){
         const key=`t_${si}_${ii}`,val=saved[key];
         const cls=submitted?(val===String(item.answer)?'correct':'incorrect'):'';
         const tC=(val==='true')?'sel-t':'',fC=(val==='false')?'sel-f':'';
+        const tfWrong=submitted&&val!==String(item.answer);
         html+=`<div class="tf-block ${cls}">
           <span class="tf-stmt">${item.statement}</span>
           <div class="tf-btns">
             <button class="tf-b ${tC}" data-key="${key}" data-val="true" onclick="pickTF(this)" ${submitted?'disabled':''}>True</button>
             <button class="tf-b ${fC}" data-key="${key}" data-val="false" onclick="pickTF(this)" ${submitted?'disabled':''}>False</button>
+            ${tfWrong?`<span style="font-size:12px;color:var(--teal);margin-left:6px;">✓ ${item.answer?'True':'False'}</span>`:''}
           </div></div>`;
       });
     }
@@ -572,6 +677,35 @@ function renderAssignment(a,existing){
         html+=`<div class="short-block"><p>${qi+1}. ${q}</p>
           <textarea data-key="${key}" placeholder="Write your answer here..." ${submitted?'readonly':''}>${esc(val)}</textarea></div>`;
       });
+    }
+    if(sec.type==='vocab_review'){
+      const chapter=VOCAB_CHAPTERS[sec.chapterId];
+      if(chapter){
+        html+=`<div class="vocab-chapter-wrap">`;
+        chapter.themes.forEach((theme,ti)=>{
+          html+=`<div class="vocab-theme-title">${theme.name}</div>`;
+          html+=`<div class="vcard-grid">`;
+          theme.words.forEach((w,wi)=>{
+            const cid=`vc-${si}-${ti}-${wi}`;
+            html+=`<div class="vcard" id="${cid}" onclick="this.classList.toggle('flipped')">
+              <div class="vcard-inner">
+                <div class="vcard-front">
+                  <div class="vw">${w.word}</div>
+                  <div class="tap">tap to reveal →</div>
+                </div>
+                <div class="vcard-back">
+                  <div class="vb-pron">${w.pronunciation}</div>
+                  <div class="vb-pos">${w.pos}</div>
+                  <div class="vb-zh">${w.zh}</div>
+                  <div class="vb-en">${w.en}</div>
+                </div>
+              </div>
+            </div>`;
+          });
+          html+=`</div>`;
+        });
+        html+=`</div>`;
+      }
     }
     html+=`</div>`;
   });
@@ -636,13 +770,251 @@ async function submitWork(){
 
 async function showDash(tab){
   document.querySelectorAll('.ds-item').forEach(i=>i.classList.remove('active'));
-  document.getElementById('dsi-'+tab).classList.add('active');
+  const dsiEl=document.getElementById('dsi-'+tab);
+  if(dsiEl)dsiEl.classList.add('active');
+  if(tab==='add'){renderAddAssignment();return;}
+  if(tab==='manage'){renderManage();return;}
   document.getElementById('dash-main').innerHTML=`<div class="loading-state"><span class="spinner"></span> Loading from Google Sheets...</div>`;
   let subs=[];
   try{subs=await apiGet();}catch(e){}
   window._dashSubs=subs;
   if(tab==='overview')renderOverview(subs);
   else renderResults(subs);
+}
+
+/* ── ADD ASSIGNMENT ── */
+let builderSections=[];
+
+function renderAddAssignment(){
+  builderSections=[];
+  document.getElementById('dash-main').innerHTML=`
+  <h2>➕ Add New Assignment</h2>
+  <div style="max-width:700px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:18px">
+      <div><label style="font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Title</label>
+        <input id="ab-title" type="text" placeholder="e.g. 7D – Chapter 3 Vocab" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:DM Sans,sans-serif;font-size:14px;outline:none"></div>
+      <div><label style="font-size:11.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px">Emoji</label>
+        <input id="ab-emoji" type="text" placeholder="📝" maxlength="2" style="width:100%;padding:11px 14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;color:var(--text);font-family:DM Sans,sans-serif;font-size:20px;outline:none"></div>
+    </div>
+    <div id="ab-sections"></div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px">
+      <button onclick="addSection('mcq')" class="add-sec-btn">＋ Multiple Choice</button>
+      <button onclick="addSection('true_false')" class="add-sec-btn">＋ True / False</button>
+      <button onclick="addSection('fill_blanks')" class="add-sec-btn">＋ Fill in Blanks</button>
+      <button onclick="addSection('matching')" class="add-sec-btn">＋ Matching</button>
+      <button onclick="addSection('vocab_chinese')" class="add-sec-btn">＋ Vocab Chinese</button>
+    </div>
+    <button class="sub-btn" onclick="saveAssignment()">💾 Save Assignment to Classroom</button>
+    <div id="ab-msg" style="margin-top:14px;font-size:13.5px"></div>
+  </div>`;
+}
+
+function addSection(type){
+  const idx=builderSections.length;
+  builderSections.push({type,id:idx});
+  const wrap=document.getElementById('ab-sections');
+  const div=document.createElement('div');
+  div.id=`sec-wrap-${idx}`;
+  div.style.cssText='background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:16px';
+  div.innerHTML=buildSectionForm(type,idx);
+  wrap.appendChild(div);
+}
+
+function lbStyle(){return 'display:block;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin-bottom:5px;margin-top:10px';}
+function inputStyle(){return 'width:100%;padding:9px 13px;background:var(--bg);border:1.5px solid var(--border);border-radius:9px;color:var(--text);font-family:DM Sans,sans-serif;font-size:14px;outline:none;box-sizing:border-box';}
+
+function buildSectionForm(type,idx){
+  const label={mcq:'Multiple Choice',true_false:'True / False',fill_blanks:'Fill in Blanks',matching:'Matching',vocab_chinese:'Vocab → Chinese'}[type];
+  let body='';
+  if(type==='mcq') body=`<div id="mcq-qs-${idx}"></div><button onclick="addMCQ(${idx})" class="add-sec-btn" style="margin-top:8px">＋ Add Question</button>`;
+  if(type==='true_false') body=`<div id="tf-qs-${idx}"></div><button onclick="addTF(${idx})" class="add-sec-btn" style="margin-top:8px">＋ Add Statement</button>`;
+  if(type==='fill_blanks') body=`<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Use _____ for each blank.</p>
+    <label style="${lbStyle()}">Word Bank (optional, comma-separated)</label>
+    <input id="fb-wb-${idx}" type="text" placeholder="e.g. harmful, chemical substances" style="${inputStyle()}">
+    <div id="fb-qs-${idx}" style="margin-top:10px"></div>
+    <button onclick="addFB(${idx})" class="add-sec-btn" style="margin-top:8px">＋ Add Sentence</button>`;
+  if(type==='matching') body=`<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">Term on the left, definition on the right.</p>
+    <div id="mt-qs-${idx}"></div><button onclick="addMT(${idx})" class="add-sec-btn" style="margin-top:8px">＋ Add Pair</button>`;
+  if(type==='vocab_chinese') body=`<div id="vc-qs-${idx}"></div><button onclick="addVC(${idx})" class="add-sec-btn" style="margin-top:8px">＋ Add Word</button>`;
+  return `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <span style="font-weight:700;font-size:14px">${label}</span>
+    <button onclick="document.getElementById('sec-wrap-${idx}').remove();builderSections[${idx}]=null" style="background:none;border:none;color:var(--coral);cursor:pointer;font-size:18px">✕</button>
+  </div>${body}`;
+}
+
+function addMCQ(idx){
+  const c=document.getElementById(`mcq-qs-${idx}`);
+  const qi=c.children.length;
+  const d=document.createElement('div');
+  d.style.cssText='background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:10px';
+  d.innerHTML=`<label style="${lbStyle()}">Question ${qi+1}</label>
+    <input type="text" id="mcq-q-${idx}-${qi}" placeholder="Question text" style="${inputStyle()}">
+    ${[0,1,2,3].map(oi=>`<div style="display:flex;gap:8px;align-items:center;margin-top:8px">
+      <input type="radio" name="mcq-ans-${idx}-${qi}" value="${oi}" id="mcq-r-${idx}-${qi}-${oi}">
+      <input type="text" id="mcq-o-${idx}-${qi}-${oi}" placeholder="Option ${String.fromCharCode(65+oi)}" style="${inputStyle()}">
+      <label for="mcq-r-${idx}-${qi}-${oi}" style="font-size:11px;color:var(--teal);white-space:nowrap">✓ correct</label>
+    </div>`).join('')}`;
+  c.appendChild(d);
+}
+
+function addTF(idx){
+  const c=document.getElementById(`tf-qs-${idx}`);
+  const qi=c.children.length;
+  const d=document.createElement('div');
+  d.style.cssText='background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:10px';
+  d.innerHTML=`<label style="${lbStyle()}">Statement ${qi+1}</label>
+    <input type="text" id="tf-s-${idx}-${qi}" placeholder="Statement text" style="${inputStyle()}">
+    <div style="margin-top:10px;display:flex;gap:16px">
+      <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="tf-ans-${idx}-${qi}" value="true"> True</label>
+      <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer"><input type="radio" name="tf-ans-${idx}-${qi}" value="false"> False</label>
+    </div>`;
+  c.appendChild(d);
+}
+
+function addFB(idx){
+  const c=document.getElementById(`fb-qs-${idx}`);
+  const qi=c.children.length;
+  const d=document.createElement('div');
+  d.style.cssText='background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:10px';
+  d.innerHTML=`<label style="${lbStyle()}">Sentence ${qi+1} (use _____ for blank)</label>
+    <input type="text" id="fb-s-${idx}-${qi}" placeholder="Drugs are _____ that affect the body." style="${inputStyle()}">
+    <label style="${lbStyle()}">Correct answer(s) — comma-separated if multiple blanks</label>
+    <input type="text" id="fb-a-${idx}-${qi}" placeholder="chemical substances" style="${inputStyle()}">`;
+  c.appendChild(d);
+}
+
+function addMT(idx){
+  const c=document.getElementById(`mt-qs-${idx}`);
+  const qi=c.children.length;
+  const d=document.createElement('div');
+  d.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px';
+  d.innerHTML=`<input type="text" id="mt-t-${idx}-${qi}" placeholder="Term ${qi+1}" style="${inputStyle()}">
+    <input type="text" id="mt-d-${idx}-${qi}" placeholder="Definition / Chinese meaning" style="${inputStyle()}">`;
+  c.appendChild(d);
+}
+
+function addVC(idx){
+  const c=document.getElementById(`vc-qs-${idx}`);
+  const qi=c.children.length;
+  const d=document.createElement('div');
+  d.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px';
+  d.innerHTML=`<input type="text" id="vc-w-${idx}-${qi}" placeholder="English word" style="${inputStyle()}">
+    <input type="text" id="vc-c-${idx}-${qi}" placeholder="中文意思" style="${inputStyle()}">`;
+  c.appendChild(d);
+}
+
+function collectBuilderData(){
+  const title=document.getElementById('ab-title').value.trim();
+  const emoji=document.getElementById('ab-emoji').value.trim()||'📝';
+  if(!title)return null;
+  const sections=[];
+  builderSections.forEach((s,idx)=>{
+    if(!s)return;
+    const {type}=s;
+    if(type==='mcq'){
+      const qs=[];let qi=0;
+      while(document.getElementById(`mcq-q-${idx}-${qi}`)){
+        const q=document.getElementById(`mcq-q-${idx}-${qi}`).value.trim();
+        const options=[0,1,2,3].map(oi=>document.getElementById(`mcq-o-${idx}-${qi}-${oi}`)?.value.trim()||'').filter(o=>o);
+        const ansEl=document.querySelector(`input[name="mcq-ans-${idx}-${qi}"]:checked`);
+        const answer=ansEl?parseInt(ansEl.value):0;
+        if(q&&options.length)qs.push({q,options,answer});
+        qi++;
+      }
+      if(qs.length)sections.push({type:'mcq',title:'Multiple Choice',emoji:'🔘',questions:qs});
+    }
+    if(type==='true_false'){
+      const items=[];let qi=0;
+      while(document.getElementById(`tf-s-${idx}-${qi}`)){
+        const statement=document.getElementById(`tf-s-${idx}-${qi}`).value.trim();
+        const ansEl=document.querySelector(`input[name="tf-ans-${idx}-${qi}"]:checked`);
+        const answer=ansEl?ansEl.value==='true':true;
+        if(statement)items.push({statement,answer});
+        qi++;
+      }
+      if(items.length)sections.push({type:'true_false',title:'True or False',emoji:'✅',items});
+    }
+    if(type==='fill_blanks'){
+      const wb=document.getElementById(`fb-wb-${idx}`)?.value.trim();
+      const wordBank=wb?wb.split(',').map(w=>w.trim()).filter(w=>w):null;
+      const items=[];let qi=0;
+      while(document.getElementById(`fb-s-${idx}-${qi}`)){
+        const sentence=document.getElementById(`fb-s-${idx}-${qi}`).value.trim();
+        const raw=document.getElementById(`fb-a-${idx}-${qi}`).value.trim();
+        const keys=raw.split(',').map(k=>k.trim()).filter(k=>k);
+        if(sentence&&keys.length)items.push({sentence,blanks:keys.map(()=>'_____'),key:keys});
+        qi++;
+      }
+      const sec={type:'fill_blanks',title:'Fill in the Blanks',emoji:'✏️',items};
+      if(wordBank)sec.wordBank=wordBank;
+      if(items.length)sections.push(sec);
+    }
+    if(type==='matching'){
+      const pairs=[],options=[];let qi=0;
+      while(document.getElementById(`mt-t-${idx}-${qi}`)){
+        const term=document.getElementById(`mt-t-${idx}-${qi}`).value.trim();
+        const def=document.getElementById(`mt-d-${idx}-${qi}`).value.trim();
+        if(term&&def){
+          const val=String.fromCharCode(97+qi);
+          pairs.push({term,answer:val});
+          options.push({val,label:`${val.toUpperCase()}. ${def}`});
+        }
+        qi++;
+      }
+      if(pairs.length)sections.push({type:'matching',title:'Match the Words',emoji:'🔗',pairs,options});
+    }
+    if(type==='vocab_chinese'){
+      const items=[];let qi=0;
+      while(document.getElementById(`vc-w-${idx}-${qi}`)){
+        const word=document.getElementById(`vc-w-${idx}-${qi}`).value.trim();
+        const answer=document.getElementById(`vc-c-${idx}-${qi}`).value.trim();
+        if(word&&answer)items.push({word,answer});
+        qi++;
+      }
+      if(items.length)sections.push({type:'vocab_chinese',title:'Write the Chinese Meaning',emoji:'📝',items});
+    }
+  });
+  if(!sections.length)return null;
+  return{id:'custom_'+Date.now(),title,emoji,subtitle:sections.map(s=>s.title).join(' · '),sections};
+}
+
+function saveAssignment(){
+  const a=collectBuilderData();
+  const msg=document.getElementById('ab-msg');
+  if(!a){msg.innerHTML='<span style="color:var(--coral)">⚠️ Please fill in the title and add at least one section with questions.</span>';return;}
+  ASSIGNMENTS.push(a);
+  msg.innerHTML='<span style="color:var(--teal)">✓ Assignment saved! Students can see it immediately.</span>';
+  showToast('✓ Assignment added!','ok');
+  setTimeout(()=>showDash('manage'),1500);
+}
+
+/* ── MANAGE ASSIGNMENTS ── */
+function renderManage(){
+  const rows=ASSIGNMENTS.map((a,i)=>`
+    <tr>
+      <td style="font-size:20px">${a.emoji}</td>
+      <td><strong>${a.title}</strong><br><span style="font-size:12px;color:var(--muted)">${a.subtitle}</span></td>
+      <td>${a.sections.length} section${a.sections.length!==1?'s':''}</td>
+      <td><button onclick="deleteAssignment('${a.id}')" style="background:none;border:1px solid var(--coral);color:var(--coral);border-radius:8px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:DM Sans,sans-serif">🗑 Delete</button></td>
+    </tr>`).join('');
+  document.getElementById('dash-main').innerHTML=`
+    <h2>📚 Manage Assignments</h2>
+    <p style="color:var(--muted);font-size:13.5px;margin-bottom:20px">All assignments currently visible to students.</p>
+    <div class="table-wrap">
+      <table class="rtable">
+        <thead><tr><th></th><th>Assignment</th><th>Sections</th><th>Action</th></tr></thead>
+        <tbody>${rows||'<tr><td colspan="4" style="text-align:center;padding:40px;color:var(--muted)">No assignments yet</td></tr>'}</tbody>
+      </table>
+    </div>
+    <button class="sub-btn" style="margin-top:20px" onclick="showDash('add')">➕ Add New Assignment</button>`;
+}
+
+function deleteAssignment(id){
+  if(!confirm('Delete this assignment? Students who already submitted will still show in results.'))return;
+  const idx=ASSIGNMENTS.findIndex(a=>a.id===id);
+  if(idx>-1)ASSIGNMENTS.splice(idx,1);
+  renderManage();
+  showToast('Assignment removed','ok');
 }
 
 function renderOverview(subs){
