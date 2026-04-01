@@ -779,7 +779,7 @@ function scoreAll(a,answers){
 
 async function submitWork(){
   const btn=document.getElementById('sub-btn');
-  btn.disabled=true;btn.innerHTML=`<span class="spinner"></span> Saving to Google Sheets...`;
+  btn.disabled=true;btn.innerHTML=`<span class="spinner"></span> Saving...`;
   const a=ASSIGNMENTS.find(x=>x.id===currentAid);
   const answers=collectAnswers();
   const score=scoreAll(a,answers);
@@ -787,7 +787,7 @@ async function submitWork(){
     await apiPost({studentName:currentUser.name,studentClass:currentUser.class,assignmentTitle:a.title,score,answers});
     mySubmissions=mySubmissions.filter(s=>s['Assignment']!==a.title);
     mySubmissions.push({'Student Name':currentUser.name,'Class':currentUser.class,'Assignment':a.title,'Score %':Math.round(score*100),'Answers (JSON)':JSON.stringify(answers),'Timestamp':new Date().toLocaleString()});
-    showToast(`✓ Saved to Google Sheets! Score: ${Math.round(score*100)}%`,'ok');
+    showToast(`✓ Submitted! Score: ${Math.round(score*100)}%`,'ok');
     await renderStudentUI();
   }catch(e){
     btn.disabled=false;btn.textContent='Submit Assignment →';
@@ -801,7 +801,7 @@ async function showDash(tab){
   if(dsiEl)dsiEl.classList.add('active');
   if(tab==='add'){renderAddAssignment();return;}
   if(tab==='manage'){renderManage();return;}
-  document.getElementById('dash-main').innerHTML=`<div class="loading-state"><span class="spinner"></span> Loading from Google Sheets...</div>`;
+  document.getElementById('dash-main').innerHTML=`<div class="loading-state"><span class="spinner"></span> Loading...</div>`;
   let subs=[];
   try{subs=await apiGet();}catch(e){}
   window._dashSubs=subs;
@@ -1061,7 +1061,7 @@ function renderOverview(subs){
   document.getElementById('dash-main').innerHTML=`
     <h2>Overview</h2>
     <div class="stats-row">
-      <div class="stat-c hi"><div class="sl">Submissions</div><div class="sv">${total}</div><div class="ss">Saved in Google Sheets ✓</div></div>
+      <div class="stat-c hi"><div class="sl">Submissions</div><div class="sv">${total}</div><div class="ss">Saved in CloudBase ✓</div></div>
       <div class="stat-c"><div class="sl">Students</div><div class="sv">${students}</div><div class="ss">Unique</div></div>
       <div class="stat-c"><div class="sl">Avg Score</div><div class="sv">${avg}%</div><div class="ss">All assignments</div></div>
       <div class="stat-c"><div class="sl">Assignments</div><div class="sv">${ASSIGNMENTS.length}</div><div class="ss">Active</div></div>
