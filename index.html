@@ -310,7 +310,7 @@ const ASSIGNMENTS=[
         {val:'c',label:'C. 药物'},{val:'d',label:'D. 有害的'},{val:'e',label:'E. 致命的'}
       ]
     },
-    {type:'fill_blanks',title:'Part 2 — Fill in the Blanks',emoji:'✏️',items:[
+    {type:'fill_blanks',title:'Part 2 — Fill in the Blanks',emoji:'✏️',wordBank:['harmful','chemical substances','recreational'],items:[
       {sentence:'Drugs are _____ that can change how the body works and affect the chemical reaction in our body and how a person feels after taking them.',blanks:['chemical substances'],key:['chemical substances']},
       {sentence:'Some drugs can be very _____ to our body if people take lots of them or use them in the wrong way.',blanks:['harmful'],key:['harmful']},
       {sentence:'_____ drugs are often taken by people for fun or relaxation, even though they may cause health problems.',blanks:['Recreational'],key:['recreational']},
@@ -508,6 +508,7 @@ function renderAssignment(a,existing){
       html+=`</div>`;
     }
     if(sec.type==='fill_blanks'){
+      if(sec.wordBank){html+=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 18px;margin-bottom:16px;font-size:13.5px;"><span style="font-weight:700;color:var(--teal);text-transform:uppercase;font-size:11px;letter-spacing:0.6px;">📦 Word Bank：</span><span style="color:var(--text);margin-left:8px;">${sec.wordBank.join(' &nbsp;/&nbsp; ')}</span></div>`;}
       sec.items.forEach((item,ii)=>{
         let s=item.sentence;
         item.blanks.forEach((_,bi)=>{
@@ -532,7 +533,7 @@ function renderAssignment(a,existing){
     if(sec.type==='mcq'){
       sec.questions.forEach((q,qi)=>{
         const key=`q_${si}_${qi}`,val=saved[key];
-        html+=`<div class="mcq-block"><div class="mcq-q">${qi+1}. ${q.q}</div><div class="mcq-opts">`;
+        html+=`<div class="mcq-block"><div class="mcq-q">${/^\d+[\.\)]/.test(q.q)?'':qi+1+'. '}${q.q}</div><div class="mcq-opts">`;
         q.options.forEach((opt,oi)=>{
           const chk=val==oi?'checked':'';
           const cls=submitted?(oi===q.answer?'correct':(val==oi&&oi!==q.answer?'incorrect':'')):'';
